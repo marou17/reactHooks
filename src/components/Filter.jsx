@@ -1,19 +1,53 @@
-import React from 'react'
+import React, { useState } from "react";
+import { Routes, Route } from "react-router-dom";
 
- const Filter = ({onTitleChange,onRatingChange}) => {
+import MovieDescription from "./MovieDescription";
+import MovieList from "./MovieList";
+import Filter from "./Filter";
+import AddMovie from "./AddMovie";
+
+import { moviesData } from "../data"; // fichier data.js avec la liste des films
+
+function App() {
+  const [movies, setMovies] = useState(moviesData);
+  const [titleFilter, setTitleFilter] = useState("");
+  const [ratingFilter, setRatingFilter] = useState(0);
+
+  const addMovie = (newMovie) => {
+    setMovies([...movies, newMovie]);
+  };
+
+  const filteredMovies = movies.filter(
+    (movie) =>
+      movie.title.toLowerCase().includes(titleFilter.toLowerCase()) &&
+      movie.rating >= ratingFilter
+  );
+
   return (
-    <div className='filter-bar'>
-        <input 
-        type="text" 
-        placeholder='Rechercher par titre '
-        onChange={(e) => onTitleChange(e.target.value)}
-         />
-        <input
-         type="number" min="0" max="10"
-         placeholder='Entrer une note entre 0 et 10 '
-         onChange={(e) => onRatingChange(Number(e.target.value))} 
-          />
+    <div className="App">
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <h1>Mes films préférés</h1>
+              <Filter
+                titleFilter={titleFilter}
+                onTitleChange={setTitleFilter}
+                onRatingChange={setRatingFilter}
+              />
+              <MovieList movies={filteredMovies} />
+              <AddMovie onAdd={addMovie} />
+            </>
+          }
+        />
+        <Route
+          path="/movie/:id"
+          element={<MovieDescription movies={movies} />}
+        />
+      </Routes>
     </div>
-  )
+  );
 }
-export default Filter;
+
+export default App;
